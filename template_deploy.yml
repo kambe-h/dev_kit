@@ -25,8 +25,7 @@ Resources:
   DynamoDBTestTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: 
-        Ref: meeting_table
+      TableName: meeting_table
       AttributeDefinitions:
       - AttributeName: id
         AttributeType: N
@@ -44,11 +43,10 @@ Resources:
         AttributeName: expireAt
         Enabled: true
 
-    DynamoDBTestTable:
+    DynamoDBTestTable2:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: 
-        Ref: sequence
+      TableName: sequence
       AttributeDefinitions:
       - AttributeName: table_name
         AttributeType: S
