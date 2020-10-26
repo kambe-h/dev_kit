@@ -14,7 +14,7 @@ Resources:
       Description: test function
       Environment:
         Variables:
-          TABLE_ARN: !GetAtt DynamoDBTestTable.Arn
+          TABLE_ARN: !GetAtt DynamoDBTestTable1.Arn
       FunctionName: !Ref LambdaFunctionName
       Handler: !Ref LambdaFunctionHandler
       MemorySize: 256
