@@ -43,7 +43,7 @@ Resources:
         AttributeName: expireAt
         Enabled: true
 
-    DynamoDBTestTable2:
+  DynamoDBTestTable2:
     Type: AWS::DynamoDB::Table
     Properties:
       TableName: sequence
