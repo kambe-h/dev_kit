@@ -83,7 +83,7 @@ Resources:
                   - "dynamodb:Query"
                   - "dynamodb:PutItem"
                   - "dynamodb:UpdateItem"
-                Resource: !GetAtt DynamoDBTestTable.Arn
+                Resource: !GetAtt DynamoDBTestTable1.Arn
         - PolicyName: !Sub ${LambdaFunctionName}-CloudWatch
           PolicyDocument:
             Version: "2012-10-17"
