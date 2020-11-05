@@ -14,7 +14,7 @@ Resources:
       Description: test function
       Environment:
         Variables:
-          TABLE_ARN: !GetAtt DynamoDBTestTable1.Arn
+          TABLE_ARN: !GetAtt DynamoDBTestTable.Arn
       FunctionName: !Ref LambdaFunctionName
       Handler: !Ref LambdaFunctionHandler
       MemorySize: 256
@@ -22,72 +22,23 @@ Resources:
       Runtime: python3.6
       Timeout: 10
 
-  DynamoDBTestTable1:
+  DynamoDBTestTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: meeting_table
       AttributeDefinitions:
-      - AttributeName: id
-        AttributeType: N
-      - AttributeName: meeting_room
+      - AttributeName: name
         AttributeType: S
-      - AttributeName: time
+      - AttributeName: key
         AttributeType: S
-      - AttributeName: usage
-        AttributeType: N
+      - AttributeName: date
+        AttributeType: S
       BillingMode: PAY_PER_REQUEST
-      KeySchema:
-      - AttributeName: id
-        KeyType: HASH
-      TimeToLiveSpecification:
-        AttributeName: expireAt
-        Enabled: true
-
-  DynamoDBTestTable2:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: sequence
-      AttributeDefinitions:
-      - AttributeName: table_name
-        AttributeType: S
-      - AttributeName: seq
-        AttributeType: N
-      BillingMode: PAY_PER_REQUEST
-      KeySchema:
-      - AttributeName: id
-        KeyType: HASH
-      TimeToLiveSpecification:
-        AttributeName: expireAt
-        Enabled: true
-
-  LambdaRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: "Allow"
-            Principal:
-              Service:
-                - "lambda.amazonaws.com"
-            Action: "sts:AssumeRole"
-
-      Policies:
-        - PolicyName: !Sub ${LambdaFunctionName}-DynamoDB
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: "Allow"
-                Action:
-                  - "dynamodb:GetItem"
-                  - "dynamodb:Query"
-                  - "dynamodb:PutItem"
-                  - "dynamodb:UpdateItem"
-                Resource: !GetAtt DynamoDBTestTable1.Arn
-        - PolicyName: !Sub ${LambdaFunctionName}-CloudWatch
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: "Allow"
-                Action: "logs:*"
-                Resource: "arn:aws:logs:*:*:*"
+      GlobalSecondaryIndexes:
+        - IndexName: KeyDate
+          KeySchema:
+          - AttributeName: key
+            KeyType: HASH
+          - AttributeName: date
+            KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
