@@ -1,0 +1,102 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Nov 20 2020
+@author: Okawa Tomomi
+"""
+
+rom datetime import datetime
+import time
+
+import paho.mqtt.client as mqtt # MQTT
+import ssl # IoT coreにTLS1.2で接続
+import json
+import datetime as dt
+from time import sleep
+sys.path.append('/home/login名/.local/lib/python3.7/site-packages') # Pathを明示的に指定
+import RPi.GPIO as GPIO
+import os # ファイルの存在チェック等
+
+# モーションセンサーのGPIOピン番号
+MOTION_PIN = 18
+#PUSHインターバル
+PUBLISH_INTERVAL = 5.0
+#センサーのチェックインターバル
+CHECK_INTERVAL = 5.0
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(GPIO_PIN, GPIO.IN)
+
+#RaspberryPieSensor Class
+class RaspberryPieSensor Class: 
+    # コンストラクタ
+    def __init__(self):
+    # 初期設定ファイルの読み込み
+        with open(INITIAL_FILE) as f:
+            jsn = json.load(f)
+            __awsport = jsn['awsport'] # AWS接続用ポート番号
+            __awscert = jsn['awscert'] # AWS認証用
+            __awskey = jsn['awskey'] # AWSプライベートキー
+            __awsroot_ca = jsn['awsroot_ca'] # AmazonRootCA
+            __awsend_point = jsn['awsend_point'] # AWSエンドポイント
+
+        # 初期値の設定
+        self.client = mqtt.Client(self.client_id, protocol=mqtt.MQTTv311) #MQTT初期化
+        self.client.tls_set(ca_certs=__awsroot_ca, # TLS通信のセット
+                            certfile=__awscert,
+                            keyfile=__awskey,
+                            cert_reqs=ssl.CERT_REQUIRED,
+                            tls_version=ssl.PROTOCOL_TLSv1_2,
+                            ciphers=None)
+        self.client.connect(__awsend_point, port=__awsport, keepalive=60) #AWS IoTに接続
+        self.client.loop_start() # ループスタート
+    def __del__(self):
+        self.client.disconnect() # 停止時にdisconnect
+
+    # AWS IoT CoreにPublishする
+    def count_publish(usage,now): 
+        # メッセージを組み立ててAWS IoT CoreにPublish
+        try:
+            __message = {'meeting_room'='ダーマ',
+                         'time':xxxx'{0:%Y-%m-%d %H:%M:%S}'.format(now), #計測した時刻を格納
+                         'usage':xxxxx} 
+             # AWS IoTに送信(Publish)
+            self.client.publish(json.dumps(__message))
+        except: # 例外時
+            ex, ms, tb = sys.exc_info()
+            self.put_error_log(type(ms)) # エラーログ処理
+
+
+#main
+try:
+    if __name__ == '__main__':
+        os.chdir(os.path.dirname(os.path.abspath(__file__))) # カレントディレクトリをプログラムのあるディレクトリに移動する
+               
+        raspberrypie_sensor = RaspberryPieSensor Class() #Raspberrypiesensorインスタンスの作成
+        while True:
+        # センサー感知
+        if(GPIO.input(GPIO_PIN) == GPIO.HIGH):
+            #(GPIO.input(GPIO_PIN)のあたい　HIGH LOW と時間datetime.now().strftime('%Y/%m/%d %H:%M:%S')を格納
+                
+            print(datetime.now().strftime('%Y/%m/%d %H:%M:%S') +
+            "：" + str("{0:05d}".format(cnt)) + "回目の人感知")
+            cnt = cnt + 1
+            time.sleep(CHECK_INTERVAL)
+        else:
+            print(GPIO.input(GPIO_PIN))
+            time.sleep(CHECK_INTERVAL)
+
+        now = dt.datetime.now() # 現在時刻を取得
+        mod_minute = now.minute % PUBLISH_INTERVAL # 分がPUBLISH_INTERVALの倍数かをチェック
+            if (mod_minute == 0 and # 分が倍数で
+                last_Minute != '{0:%Y-%m-%d %H:%M}'.format(now)): #　同一分では１回のみAWS IoT CoreにPublish
+                watch_over.count_publish(from_now, now, find_count) # publish
+                from_now = now # Publishした時刻を前回の時刻として保存
+                last_Minute = '{0:%Y-%m-%d %H:%M}'.format(now) # 時刻をセット
+                find_count = 0 # カウンターをリセット
+                    
+            sleep(CHECK_INTERVAL) # 指定秒数の間隔で繰り返す
+except KeyboardInterrupt:
+    pass
+finally:
+    watch_over.__del__()
+    GPIO.cleanup()
